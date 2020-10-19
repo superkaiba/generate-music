@@ -4,8 +4,6 @@ import os
 import tensorflow as tf 
 from tensorflow import keras
 from tensorflow.keras import layers
-# Step 1. Import midi file and merge all tracks into one track
-    
 
 class Data():
 
