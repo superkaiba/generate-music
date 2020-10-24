@@ -4,6 +4,7 @@ import os
 import tensorflow as tf 
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras.utils import to_categorical
 
 class Data():
 
@@ -46,6 +47,20 @@ print(myData.labels[0].shape)
 # track = new_midi_file.add_track()
 # new_midi_file.save("new_midi_file.midi")
 
+'''
+HOW TO CHOOSE LAYERS:
+    - Mostly empirical
+    - Look up structures online
+    - Tendency to funnel (from more nodes to less)
+    - Tendency to use powers of 2
+'''
+
+'''
+REGULARIZATION TIPS:
+    - Data Augmentation (Get more training data)
+        ex: - Apply random noise to data (add small amount to each feature)
+            - Transform training data (ex: move 1 in MNIST to different part of image)
+'''
 ''' 
 
 POSSIBLE DATASETS: 
