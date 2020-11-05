@@ -13,11 +13,29 @@ class Data():
         self.labels = []
         for file in os.listdir(dirname):
             notes, nextnotes = self.clean_midi_file(os.path.join(dirname, file))
-            self.data.append(np.array(notes))
-            self.labels.append(np.array(nextnotes))
+            for note in notes:
+                self.data.append(note)
+            for label in nextnotes:
+                self.labels.append(label)
             
         self.data = np.array(self.data)
         self.labels = np.array(self.labels)
+        self.possible_labels = self.get_possible_labels()
+        self.possible_labels_dict = {}
+
+        for index, possible_label in enumerate(self.possible_labels):
+            self.possible_labels_dict[repr(possible_label)] = index
+
+        self.encoded_labels = []
+        for label in self.labels:
+            self.encoded_labels.append(self.one_hot_encode(repr(label)))
+
+        self.encoded_data = [self.one_hot_encode(repr(datapoint)) for datapoint in self.data]
+        self.encoded_data = np.array(self.encoded_data)
+        self.encoded_labels = np.array(self.encoded_labels)
+
+
+
     
     def clean_midi_file(self, filename):
         midi_file = md.MidiFile(filename)
@@ -31,18 +49,55 @@ class Data():
         
         return relevant_notes, nextnotes  
 
+    def get_possible_labels(self):
+        possible_notes = np.unique(self.labels[:,0])
+        possible_times = np.unique(self.labels[:,1])
+        possible_labels = np.array(np.meshgrid(possible_notes, possible_times)).T.reshape(-1,2)
+
+        return possible_labels
+
+    def one_hot_encode(self, note):
+        one_hot_array = np.zeros(len(self.possible_labels))
+        one_hot_array[self.possible_labels_dict[note]] = 1
+        return one_hot_array
+
 myData = Data("test")
 
-print(myData.data)
-print(myData.labels)
-print(myData.data[0].shape)
-print(myData.labels[0].shape)
+divby50 = (len(myData.encoded_data) - (len(myData.encoded_data) % 50))
+myData.encoded_data = myData.encoded_data[:divby50,:]
+myData.encoded_data = myData.encoded_data.reshape(-1,50, len(myData.possible_labels))
+print(myData.encoded_data.shape)
 
-# possible_notes = np.unique(clean_data[:,0])
-# possible_times = np.unique(clean_data[:,1])
-# possible_labels = np.array(np.meshgrid(possible_notes, possible_times)).T.reshape(-1,2)
+myData.encoded_labels = myData.encoded_labels[:divby50,:]
+myData.encoded_labels = myData.encoded_labels.reshape(-1, 50, len(myData.possible_labels))
+print(myData.encoded_labels.shape)
+print(myData.possible_labels)
+# for label in myData.encoded_labels:
+#     print(np.where(label==1))
+# print(myData.encoded_labels)
 
-# model.summary()
+model = keras.Sequential()
+model.add(layers.LSTM(128, activation='relu', recurrent_activation='relu', input_shape=(50, len(myData.possible_labels)), return_sequences=True))
+model.add(layers.Dense(len(myData.possible_labels), activation='softmax'))
+
+opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+model.compile(
+    optimizer=opt, 
+    loss="categorical_crossentropy", 
+    metrics=['accuracy']
+    )
+
+model.summary()
+model.fit(myData.encoded_data, myData.encoded_labels, batch_size=128, epochs=10)
+model.save("lstmmodel")
+# # model = keras.models.load_model('lstmmodel')
+input_array = np.array([36, 2160])
+input_array = myData.one_hot_encode(repr(input_array))
+input_array = input_array.reshape(1,1,len(myData.possible_labels))
+print(input_array)
+print(np.argmax(model.predict(input_array), axis=-1))
+
+
 # new_midi_file = md.MidiFile()
 # track = new_midi_file.add_track()
 # new_midi_file.save("new_midi_file.midi")
