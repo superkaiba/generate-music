@@ -13,6 +13,7 @@ class Data():
         self.labels = []
         for file in os.listdir(dirname):
             notes = self.clean_midi_file(os.path.join(dirname, file))
+            
             i = 50
             while i < len(notes):
                 self.data.append(notes[i-50:i])
@@ -21,7 +22,17 @@ class Data():
             
         self.data = np.array(self.data)
         self.labels = np.array(self.labels)
-        self.data = keras.utils.normalize(self.data)
+        self.max_vector = self.data.max(axis=0).max(axis=0)
+        # print(self.max_vector)
+        # print(self.data)
+        # print(self.labels)
+        self.data = self.data/self.max_vector
+        self.labels = self.labels/self.max_vector
+        # print(self.data)
+        # print("labels", self.labels)
+        # print(self.data)
+        # self.data = keras.utils.normalize(self.data)
+        # print(self.data)
 
 
     
@@ -35,24 +46,7 @@ class Data():
         return relevant_notes
 
 myData = Data("test")
-print(myData.data.shape)
-print(myData.labels.shape)
-# divby50 = (len(myData.labels) - (len(myData.labels) % 50))
-# myData.encoded_data = myData.encoded_data[:divby50,:]
-# myData.data = myData.data[:divby50,:]
-# myData.data = myData.data.reshape(-1,50,2)
-# myData.labels = myData.labels[:divby50,:]
-# myData.labels = myData.labels.reshape(-1,50,2)
-# print(myData.encoded_data.shape)
 
-# myData.encoded_labels = myData.encoded_labels[:divby50,:]
-# myData.encoded_labels = myData.encoded_labels.reshape(-1, 50, len(myData.possible_labels))
-# print(myData.encoded_labels)
-# print(myData.encoded_labels.shape)
-# print(np.where(myData.encoded_labels==1))
-# for label in myData.encoded_labels:
-#     print(np.where(label==1))
-# print(myData.encoded_labels)
 
 model = keras.Sequential()
 model.add(layers.LSTM(512, activation='relu', recurrent_activation='sigmoid', input_shape=(50, 2), return_sequences=False))
@@ -69,10 +63,11 @@ model.summary()
 model.fit(myData.data, myData.labels, batch_size=7, epochs=10)
 model.save("lstmmodel")
 # # model = keras.models.load_model('lstmmodel')
-input_array = np.array([36, 2160])
-# input_array = myData.one_hot_encode(repr(input_array))
-input_array = input_array.reshape(1,1,2)
+input_array = myData.data[0]
 print(input_array)
+# input_array = myData.one_hot_encode(repr(input_array))
+input_array = input_array.reshape(1,50,2)
+
 print(model.predict(input_array))
 
 
