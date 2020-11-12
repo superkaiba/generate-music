@@ -5,7 +5,7 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.utils import to_categorical
-
+import random
 class Data():
 
     def __init__(self, dirname):
@@ -22,22 +22,17 @@ class Data():
             
         self.data = np.array(self.data)
         self.labels = np.array(self.labels)
+
         self.max_vector = self.data.max(axis=0).max(axis=0)
-        # print(self.max_vector)
-        # print(self.data)
-        # print(self.labels)
-        self.data = self.data/self.max_vector
-        self.labels = self.labels/self.max_vector
-        # print(self.data)
-        # print("labels", self.labels)
-        # print(self.data)
-        # self.data = keras.utils.normalize(self.data)
-        # print(self.data)
+        self.data = self.data/self.max_vector       # normalize data
+        self.labels = self.labels/self.max_vector # normalize data
+
 
 
     
     def clean_midi_file(self, filename):
         midi_file = md.MidiFile(filename)
+
         merged_track = md.merge_tracks([midi_file.tracks[1],midi_file.tracks[2]]) # Merge both piano tracks into one track
 
         relevant_notes = [x for x in merged_track if (x.type == "note_on" and (x.velocity != 0 or x.time != 0))] # Filter out useless midi messages that have no volume or time value
@@ -45,35 +40,38 @@ class Data():
         
         return relevant_notes
 
-myData = Data("test")
-
+myData = Data("beeth")
+print(myData.data)
 
 model = keras.Sequential()
-model.add(layers.LSTM(512, activation='relu', recurrent_activation='sigmoid', input_shape=(50, 2), return_sequences=False))
+model.add(layers.LSTM(1024, activation='relu', recurrent_activation='relu', input_shape = (50,2), return_sequences=True))
+model.add(layers.LSTM(512, activation='relu', recurrent_activation='relu', input_shape=(50, 1), return_sequences=True))
+model.add(layers.LSTM(256, activation='relu', recurrent_activation='relu', input_shape=(50,1), return_sequences=False))
 model.add(layers.Dense(2, activation='relu'))
 
-opt = tf.keras.optimizers.Adam(learning_rate=0.01)
+filepath = "weights-improvement-{epoch:02d}-{loss:.4f}-bigger.hdf5"    
+checkpoint = keras.callbacks.ModelCheckpoint(
+    filepath, monitor='loss', 
+    verbose=0,        
+    save_best_only=True,        
+    mode='min'
+)    
+
+opt = tf.keras.optimizers.Adam(learning_rate=0.0001)
 model.compile(
     optimizer=opt, 
     loss="mse", 
-    metrics=['accuracy']
     )
 
 model.summary()
-model.fit(myData.data, myData.labels, batch_size=7, epochs=10)
+model.fit(myData.data, myData.labels, batch_size=64, epochs=20, callbacks=[checkpoint])
 model.save("lstmmodel")
-# # model = keras.models.load_model('lstmmodel')
+
 input_array = myData.data[0]
 print(input_array)
-# input_array = myData.one_hot_encode(repr(input_array))
 input_array = input_array.reshape(1,50,2)
 
 print(model.predict(input_array))
-
-
-# new_midi_file = md.MidiFile()
-# track = new_midi_file.add_track()
-# new_midi_file.save("new_midi_file.midi")
 
 '''
 HOW TO CHOOSE LAYERS:
