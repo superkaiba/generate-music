@@ -1,1 +1,10 @@
 dataset
+
+ignore
+*.hdf5
+*.mid
+*.midi
+*.npy
+*.csv
+.vscode
+.git
