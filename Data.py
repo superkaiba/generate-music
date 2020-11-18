@@ -49,8 +49,9 @@ class Data():
         one_hot_array[self.possible_labels_dict[note]] = 1
         return one_hot_array
 
-myData = Data("test-data")
+myData = Data("test-data")  # put folder with data to be converted to .npy format here
 
-np.save("test-data.npy",myData.data)
-# np.save("possible_labels.npy",myData.possible_labels)
-# np.save("encoded_labels.npy",myData.encoded_labels)
+# put desired names for .npy data files here
+np.save("test-data.npy", myData.data)
+np.save("possible_labels.npy", myData.possible_labels)
+np.save("encoded_labels.npy", myData.encoded_labels)

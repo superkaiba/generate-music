@@ -9,8 +9,10 @@ from utils import create_model, get_start_of_midi_file, denormalize, normalize
 import random
 from params import NUM_TIMESTEPS
 
+# put path to weights folder that you want to use here
 weights_path = "weights-epoch-01-loss-0.6877-accuracy-0.8289.hdf5"
 
+# put path to test-data .npy files that you want to use here
 possible_labels = np.load("possible_labels.npy")
 data = np.load("test-data.npy")
 
@@ -40,6 +42,7 @@ for i in range(1500):
     print(i)
 
 # print("Random index: ", random_index)
+# Put name of file to save to here
 new_midi_file.save("random-index-{}-epoch-01-loss-0.6877-accuracy-0.8289.midi".format(random_index))
 
 # good weights to generate:
