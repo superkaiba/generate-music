@@ -1,0 +1,6 @@
+import numpy as np
+NUM_TIMESTEPS = 250
+MIN_VECTOR = np.array([21, 0, 0])
+MAX_VECTOR = np.array([108, 720, 1])
+RANGE_VECTOR = MAX_VECTOR - MIN_VECTOR
+POSSIBLE_TIMES = [0, 40, 80, 120, 180, 240, 480, 720]
