@@ -1,4 +1,4 @@
-# Generate music with LSTM neural network with attention
+# Generate music with a LSTM neural network with attention
 Final project for MAIS 202: Accelerated Introduction to Machine Learning bootcamp, hosted by the McGill Artificial Intelligence Society.
 
 Goal: Generate tonal piano music using a LSTM neural network with attention
@@ -33,6 +33,8 @@ run app.py
 
 ## Dataset
 Dataset can be found already separated in 'train-data' and 'test-data' folders
+
+A subset of the dataset containing only pieces by Mozart and Haydn can be found in "smaller-dataset-test" and "smaller-dataset-train"
 
 Data taken from here: http://www.piano-midi.de/
 Train/test split can be done differently, but pretrained weights provided assume current train/test split
