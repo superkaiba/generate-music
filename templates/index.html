@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<script type="text/javascript">// <![CDATA[
+   function preloader(){
+       document.getElementById("loading").style.display = "block";
+   }//preloader
+// ]]></script>
+<body>
+
+   <div id="Piano music generator" class="content">
+      <h1 class="title"> PIANO MUSIC GENERATOR </h1>
+
+      <form id="form" method="POST" enctype="multipart/form-data">
+         <label for="sequence_length">Length of composition to generate:</label>
+         <input class="form-input" id="sequence_length" type="number" name="sequence_length" value="500">
+         <br><br>
+         <label for="composers">Composer to get starting sequence from:</label>
+            <select class="form-input" id="composers" name="composer">
+               <option value="beethoven">Beethoven</option>
+               <option value="burgmueller">Burgmueller</option>
+               <option value="chopin">Chopin</option>
+               <option value="haydn">Haydn</option>
+               <option value="mendelssohn">Mozart</option>
+               <option value="schubert">Schubert</option>
+               <option value="schumann">Schumann</option>
+               <option value="tchaikovsky">Tchaikovsky</option>
+               <option value="haydn">Haydn</option>
+            </select>
+            <br><br>
+         <input type="submit" class="button" value="Generate" id="generate-music" name="image" onchange=submit() onclick="document.getElementById('loading').style.display = 'block';"/>
+      </form>
+      <br><br>
+      <div id="loading" class="loading">
+         Generating new piece
+         <img src="static/loading.gif"/ height="15px">
+      </div>
+      {% if audiofile != None %}
+      <br>
+         <audio class="audio-player" controls>
+            <source src={{ audiofile }}>
+         </audio>
+         <div class="flex-box">
+         <div class="splitscreen">
+            <form class="left" id="download_midi" method="POST" enctype="multipart/form-data">
+               <input class="button small-button" type="submit" value="Download MIDI" id="download-midi-button" name="download_midi" onchange=submit()/>
+               <input hidden type="text" id="current-audio" value={{ audiofile }} name="current_audio"/>
+            </form>
+            <form class="right" id="download_wav" method="POST" enctype="multipart/form-data">
+               <input class="button small-button" type="submit" value="Download WAV" id="download-wav-button" name="download_wav" onchange=submit()/>
+               <input hidden type="text" id="current-audio" value={{ audiofile }} name="current_audio"/>
+            </form>
+         </div>
+      </div>
+      </br>
+      {% endif %}
+   </div>
+
+</body>
+
+</html>

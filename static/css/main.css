@@ -1,0 +1,101 @@
+.center {
+  display: block;
+  margin: auto;
+}
+
+
+/* UPLOAD FILE BUTTON */
+
+input[type="file"] {
+  display: none;
+}
+
+.custom-button {
+  color: white;
+  text-align: center;
+  background-color: #ababab;
+  padding: 6px 12px;
+  max-width: 200px;
+  cursor: pointer;
+}
+
+.title {
+  color:black;
+  font-size:50px
+}
+
+.audio-player {
+  width: 400px;
+	min-width: 300px;
+	height: 56px;
+	box-shadow: 0 4px 16px 0;
+	justify-content: space-between;
+	align-items: center;
+	padding-left: 24px;
+	padding-right: 24px;
+	border-radius: 4px;
+	user-select: none;
+	background-color: white;
+	box-sizing: border-box;
+	outline: none;
+}
+
+.button {
+  color: #fff !important;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: #db0000;
+  padding: 20px;
+  border-radius: 5px;
+  display: inline-block;
+  border: none;
+  transition: all 0.4s ease 0s;
+  font-family: "Lucida Console", Courier, monospace;
+  font-size:20px;
+  display:inline-block;
+  }
+
+.button:hover {
+background: #434343;
+letter-spacing: 1px;
+-webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+-moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+box-shadow: 5px 40px -10px rgba(0,0,0,0.57);
+transition: all 0.4s ease 0s;
+cursor:pointer;
+}
+.form-input {
+  font-size:15px;
+  padding:2px;
+  font-family: "Lucida Console", Courier, monospace;
+}
+.small-button {
+  font-size:15px;
+  padding:10px;
+  margin:10px;
+}
+.flex-box {
+  display:flex;
+  justify-content: center;
+}
+.splitscreen {
+  display:flex;
+  width:30%;
+
+}
+.splitscreen .left {
+  flex: 1;
+}
+.splitscreen .right {
+  flex: 1;
+}
+.content {
+  text-align: center;
+  font-family: "Lucida Console", Courier, monospace;
+}
+
+.loading {
+  display:none; 
+}
+
+

@@ -6,3 +6,9 @@ ignore
 *.csv
 .vscode
 .git
+results
+*.wav
+*.midi
+tri-class-modelv2
+triclass-stuff
+__pycache__

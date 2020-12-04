@@ -1,26 +1,35 @@
-# generate-music
+# Generate music with LSTM neural network with attention
 Final project for MAIS 202: Accelerated Introduction to Machine Learning bootcamp, hosted by the McGill Artificial Intelligence Society.
 
-Goal: Generate tonal piano music using machine learning. 
+Goal: Generate tonal piano music using a LSTM neural network with attention
 
+Information about model architecture, challenges, data preprocessing and process can be found [here](https://devpost.com/software/generate-music)
 ## Packages
 To get necessary packages: pip3 install -r "requirements.txt"
 
-## Project structure
-Change model architecture in utils.py -> create_model()
+## Training the model as is
+Run generate_data.py with default parameters
 
-Use Data.py to generate new .npy files to train with
+Run train.py 
 
-Use train.py to train model from .npy files (train data, possible labels, encoded labels)
+## Generating music
+Run generate_data.py with default parameters if not already done
 
-Use params.py to change general parameters such as number of timesteps for model, or possible durations for notes
+Run generate_music.py, changing weights_path, midi_output_dir and wav_output_dir as desired
 
-## Dataset
-Large dataset can be found in 'train-data' and 'test-data' folders
+## Making changes to model
+Change model architecture in model.py -> MusicGenerator -> create_model()
 
-Smaller dataset to test out model can be found in 'smaller-dataset-train' and 'smaller-dataset-test' folders (Just Mozart and Haydn)
+Change loss functions or loss weights in model.py -> MusicGenerator -> train.py
 
-Data taken from here: http://www.piano-midi.de/
+Change number of timesteps in params.py (requires rerunning generate_data.py)
+
+Once changes are made, run train.py to train new model
+
+## Running the webapp
+run generate_composer_data.py
+
+run app.py
 
 ## Deliverables
 Deliverables for McGill Artificial Intelligence Society's Accelerated Introduction to Machine Learning Bootcamp found in 'Deliverables' folder
