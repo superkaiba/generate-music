@@ -1,5 +1,3 @@
-dataset
-
 ignore
 *.hdf5
 *.npy
