@@ -93,7 +93,7 @@ class MusicGenerator:
         duration_labels = np.load(duration_labels_fpath)
         vel_labels = np.load(vel_labels_fpath)
 
-        os.mkdir(self.model_name)
+        # os.mkdir(self.model_name)
 
         filepath = self.model_name + "/weights-epoch-{epoch:02d}-loss-{loss:.4f}-accuracy-{pitch_out_accuracy:.4f}.hdf5" 
         checkpoint = keras.callbacks.ModelCheckpoint(
@@ -151,7 +151,7 @@ class MusicGenerator:
         if include_initial_sequence:
             for i in range(NUM_TIMESTEPS):
                 note = denormalize(sequence[0][i])
-                track.append(md.Message('note_on', note=int(note[0]), time=int(note[1]), velocity=int(note[2])))
+                track.append(md.Message('note_on', note=int(note[0]), time=int(note[1]) * 1.3, velocity=int(note[2])))
             track.append(md.Message('note_on', note=108, time=0, velocity=100)) # Indicate end of initial sequence
 
         note_range = range(21,109)

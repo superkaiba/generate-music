@@ -2,7 +2,7 @@ from model import MusicGenerator
 from params import *
 
 SEQUENCE_LENGTH = 500
-WEIGHTS_PATH = "triclassv2-weights-epoch-31-loss-0.3698-accuracy-0.9246.hdf5"
+WEIGHTS_PATH = "webapp-data/weights.hdf5"
 MIDI_OUTPUT_DIR = "static/midi"
 WAV_OUTPUT_DIR = "static/audio"
 model = MusicGenerator()

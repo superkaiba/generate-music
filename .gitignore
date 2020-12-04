@@ -1,5 +1,6 @@
 ignore
 *.hdf5
+
 *.npy
 *.csv
 .vscode
@@ -7,7 +8,8 @@ ignore
 results
 *.wav
 *.midi
+!examples/*.midi
 tri-class-modelv2
 triclass-stuff
 __pycache__
-music_generator_final
+music_generator
