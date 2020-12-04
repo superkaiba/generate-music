@@ -3,7 +3,7 @@ Final project for MAIS 202: Accelerated Introduction to Machine Learning bootcam
 
 Goal: Generate tonal piano music using a LSTM neural network with attention
 
-Information about architecture can be found (https://devpost.com/software/generate-music "here")
+Information about architecture can be found [here](https://devpost.com/software/generate-music)
 ## Packages
 To get necessary packages: pip3 install -r "requirements.txt"
 
