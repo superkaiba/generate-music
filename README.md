@@ -8,35 +8,36 @@ Information about model architecture, challenges, data preprocessing and process
 To get necessary packages: pip3 install -r "requirements.txt"
 
 ## Training the model as is
-Run generate_data.py with default parameters
+- Run `generate_data.py` with default parameters
 
-Run train.py 
+- Run `train.py`
 
 ## Generating music
-Run generate_data.py with default parameters if not already done
+- Run `generate_data.py` with default parameters if not already done
 
-Run generate_music.py, changing weights_path, midi_output_dir and wav_output_dir as desired
+- Run `generate_music.py`, changing weights_path, midi_output_dir and wav_output_dir as desired
 
 ## Making changes to model
-Change model architecture in model.py -> MusicGenerator -> create_model()
+- Change model architecture in `model.py -> MusicGenerator -> create_model()`
 
-Change loss functions or loss weights in model.py -> MusicGenerator -> train.py
+- Change loss functions or loss weights in `model.py -> MusicGenerator -> train.py`
 
-Change number of timesteps in params.py (requires rerunning generate_data.py)
+- Change number of timesteps in `params.py` (requires rerunning `generate_data.py`)
 
-Once changes are made, run train.py to train new model
+Once changes are made, run `train.py` to train new model
 
 ## Running the webapp
-run generate_composer_data.py
+- run `generate_composer_data.py`
 
-run app.py
+- run `app.py`
 
 ## Dataset
 Dataset can be found already separated in 'train-data' and 'test-data' folders
 
-A subset of the dataset containing only pieces by Mozart and Haydn can be found in "smaller-dataset-test" and "smaller-dataset-train"
+A subset of the dataset containing only pieces by Mozart and Haydn (useful for quicklytesting models) can be found in 'smaller-dataset-test' and 'smaller-dataset-train'. 
 
 Data taken from here: http://www.piano-midi.de/
+
 Train/test split can be done differently, but pretrained weights provided assume current train/test split
 
 ## Deliverables
