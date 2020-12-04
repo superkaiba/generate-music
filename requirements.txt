@@ -1,3 +1,6 @@
 tensorflow==2.3.1
+Flask==1.1.2
+keras_self_attention==0.47.0
 numpy==1.18.5
 mido==1.2.9
+midi2audio==0.1.1
