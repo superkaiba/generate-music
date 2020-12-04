@@ -12,8 +12,8 @@ def answer_query():
         music_generator = MusicGenerator()
         fname=music_generator.generate(
             sequence_length=int(request.form['sequence_length']),
-            weights_path="data/triclassv2-weights-epoch-22-loss-0.7198-accuracy-0.8010.hdf5",
-            generation_data_path=f"data/{request.form['composer']}-data.npy",
+            weights_path="webapp-data/triclassv2-weights-epoch-22-loss-0.7198-accuracy-0.8010.hdf5",
+            generation_data_path=f"webapp-data/{request.form['composer']}-data.npy",
             midi_output_dir="static/midi",
             wav_output_dir="static/audio",
             )
