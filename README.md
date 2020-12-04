@@ -31,5 +31,11 @@ run generate_composer_data.py
 
 run app.py
 
+## Dataset
+Dataset can be found already separated in 'train-data' and 'test-data' folders
+
+Data taken from here: http://www.piano-midi.de/
+Train/test split can be done differently, but pretrained weights provided assume current train/test split
+
 ## Deliverables
 Deliverables for McGill Artificial Intelligence Society's Accelerated Introduction to Machine Learning Bootcamp found in 'Deliverables' folder
