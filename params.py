@@ -1,6 +1,6 @@
 import numpy as np
 NUM_TIMESTEPS = 150
-MAX_DURATION = 1440
+MAX_DURATION = 720
 OUTPUT_VEL = 40
 
 MIN_VECTOR = np.array([21, 0, 0])

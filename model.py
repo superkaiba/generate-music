@@ -14,48 +14,66 @@ from utils import *
 from midi2audio import FluidSynth
 
 class MusicGenerator:
-    def __init__(self, lstm_units=512, model_name="music_generator"):
+    def __init__(self, lstm_units=1024, model_name="music_generator"):
         self.lstm_units = lstm_units
         self.model_name = model_name
         self.model = self.create_model()
 
-    def create_model(self):
+    # def create_model(self):
 
+    #     inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
+    #     x = SeqSelfAttention(attention_activation='tanh')(inputs)
+
+    #     hidden_states = layers.LSTM(
+    #         self.lstm_units, 
+    #         activation='tanh', 
+    #         recurrent_activation='sigmoid', 
+    #         input_shape=(NUM_TIMESTEPS, 3), 
+    #         return_sequences=True)(x)
+
+    #     last_hidden_state = hidden_states[:,NUM_TIMESTEPS - 1,:]
+    #     last_hidden_state = layers.Reshape((1, self.lstm_units))(last_hidden_state)
+
+    #     vel_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
+    #     vel_context_vector = layers.Reshape((self.lstm_units,))(vel_context_vector)
+    #     reshaped_last_hidden_state = layers.Reshape((self.lstm_units,))(last_hidden_state)
+
+    #     x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, vel_context_vector])
+    #     vel_output = layers.Dense(units=2, activation='softmax', name='vel_out')(x)
+
+    #     dur_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
+    #     dur_context_vector = layers.Reshape((self.lstm_units,))(dur_context_vector)
+
+    #     x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, dur_context_vector, vel_output])
+    #     duration_output = layers.Dense(units=1, activation='sigmoid', name='duration_out')(x)
+
+    #     pitch_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
+    #     pitch_context_vector  = layers.Reshape((self.lstm_units,))(pitch_context_vector)
+    #     x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, pitch_context_vector, duration_output, vel_output])
+
+    #     pitch_outputs = layers.Dense(units=88, activation = 'softmax', name='pitch_out')(x)
+    #     model = keras.Model(inputs=inputs, outputs=[pitch_outputs, duration_output, vel_output])
+
+    #     return model
+    def create_model(self):
         inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
         x = SeqSelfAttention(attention_activation='tanh')(inputs)
-
-        x = layers.LSTM(
-            self.lstm_units, 
-            dropout=0.2,
-            recurrent_dropout=0.2,
-            activation='tanh', 
-            recurrent_activation='sigmoid', 
-            input_shape=(NUM_TIMESTEPS, 3), 
-            return_sequences=True)(x)
-
-        x = SeqSelfAttention(attention_activation='tanh')(x)
-
         hidden_states = layers.LSTM(
-            self.lstm_units, 
-            dropout=0.2,
-            recurrent_dropout=0.2,
+            1024, 
             activation='tanh', 
             recurrent_activation='sigmoid', 
             input_shape=(NUM_TIMESTEPS, 3), 
             return_sequences=True)(x)
-
 
         last_hidden_state = hidden_states[:,NUM_TIMESTEPS - 1,:]
-        last_hidden_state = layers.Reshape((1, self.lstm_units))(last_hidden_state)
+        last_hidden_state = layers.Reshape((1, 1024))(last_hidden_state)
 
         context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
-        context_vector = layers.Reshape((self.lstm_units,))(context_vector)
 
-        last_hidden_state = layers.Reshape((self.lstm_units,))(last_hidden_state)
+        context_vector = layers.Reshape((1024,))(context_vector)
+        last_hidden_state = layers.Reshape((1024,))(last_hidden_state)
 
         x = layers.Concatenate(axis=-1)([last_hidden_state, context_vector])
-        x = layers.Dropout(0.2)(x)
-        
         vel_output = layers.Dense(units=2, activation='softmax', name='vel_out')(x)
         x = layers.Concatenate(axis=-1)([x, vel_output])
 
@@ -64,40 +82,12 @@ class MusicGenerator:
 
         pitch_outputs = layers.Dense(units=88, activation = 'softmax', name='pitch_out')(x)
         model = keras.Model(inputs=inputs, outputs=[pitch_outputs, duration_output, vel_output])
-
         return model
-    # def create_model(self):
-    #     inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
-    #     x = SeqSelfAttention(attention_activation='tanh')(inputs)
-    #     hidden_states = layers.LSTM(
-    #         1024, 
-    #         activation='tanh', 
-    #         recurrent_activation='sigmoid', 
-    #         input_shape=(NUM_TIMESTEPS, 3), 
-    #         return_sequences=True)(x)
-
-    #     last_hidden_state = hidden_states[:,NUM_TIMESTEPS - 1,:]
-    #     last_hidden_state = layers.Reshape((1, 1024))(last_hidden_state)
-
-    #     context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
-
-    #     context_vector = layers.Reshape((1024,))(context_vector)
-    #     last_hidden_state = layers.Reshape((1024,))(last_hidden_state)
-
-    #     x = layers.Concatenate(axis=-1)([last_hidden_state, context_vector])
-    #     vel_output = layers.Dense(units=2, activation='softmax', name='vel_out')(x)
-    #     x = layers.Concatenate(axis=-1)([x, vel_output])
-
-    #     duration_output = layers.Dense(units=1, activation='sigmoid', name='duration_out')(x)
-    #     x = layers.Concatenate(axis=-1)([x, duration_output])
-
-    #     pitch_outputs = layers.Dense(units=88, activation = 'softmax', name='pitch_out')(x)
-    #     model = keras.Model(inputs=inputs, outputs=[pitch_outputs, duration_output, vel_output])
-    #     return model
 
     def train(self, epochs=50, lr=0.001, initial_epoch=0, train_data_fpath=TRAIN_DATA_FPATH, pitch_labels_fpath=PITCH_LABELS_FPATH, duration_labels_fpath=DURATION_LABELS_FPATH, vel_labels_fpath=VEL_LABELS_FPATH):
         '''Trains model with specified parameters using data from specified filepaths
         '''
+
         data = np.load(train_data_fpath)
         pitch_labels = np.load(pitch_labels_fpath)
         duration_labels = np.load(duration_labels_fpath)
@@ -128,11 +118,11 @@ class MusicGenerator:
                 "vel_out":"binary_crossentropy"
                 }, 
         # Change loss weights here if want more precision for duration/pitch/velocity
-            loss_weights={
-                "pitch_out":2,
-                "duration_out":1,
-                "vel_out":1
-            },
+            # loss_weights={
+            #     "pitch_out":1,
+            #     "duration_out":1,
+            #     "vel_out":1
+            # },
 
             metrics={
                 'pitch_out':'accuracy',
@@ -143,7 +133,7 @@ class MusicGenerator:
 
         self.model.save(f"{self.model_name}/saved_model_configuration")
 
-        self.model.fit(x=data,  y={'pitch_out': pitch_labels, 'duration_out': duration_labels, 'vel_out': vel_labels}, batch_size=64, epochs=50, callbacks=[checkpoint, csvlogger, myScheduler], initial_epoch=initial_epoch)
+        self.model.fit(x=data,  y={'pitch_out': pitch_labels, 'duration_out': duration_labels, 'vel_out': vel_labels}, batch_size=128, epochs=epochs, callbacks=[checkpoint, csvlogger, myScheduler], initial_epoch=initial_epoch)
              
     def generate(self, sequence_length, weights_path, generation_data_path, midi_output_dir=".", wav_output_dir=".", random_index=None, include_initial_sequence=True):
         
@@ -153,7 +143,7 @@ class MusicGenerator:
 
         if random_index == None:
             random_index = randrange(0,len(generation_data))
-
+            
         sequence = generation_data[random_index].reshape(1, NUM_TIMESTEPS, 3)
 
         new_midi_file = md.MidiFile()
@@ -181,9 +171,9 @@ class MusicGenerator:
             if new_note_vel != 0:
                 velocity = OUTPUT_VEL
             
-            track.append(md.Message('note_on', note=new_note[0], time=int(new_note[1]), velocity = velocity))
+            track.append(md.Message('note_on', note=new_note[0], time=int(new_note[1]* 1.3), velocity = velocity))
             print(i)
-        data_path = generation_data_path[5:-4]
+        data_path = generation_data_path[12:-4]
         midi_name = f"{midi_output_dir}/{data_path}-random-index-{random_index}.midi"
         audio_name = f"{wav_output_dir}/{data_path}-random-index-{random_index}.wav"
         new_midi_file.save(midi_name)
@@ -191,8 +181,8 @@ class MusicGenerator:
         return audio_name
         
     def round_down(self, duration):
-        if duration > 720:
-            return 720
+        if duration > MAX_DURATION:
+            return MAX_DURATION
         elif duration < 40:
             return 0
         else:

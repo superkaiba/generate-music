@@ -42,3 +42,8 @@ Train/test split can be done differently, but pretrained weights provided assume
 
 ## Deliverables
 Deliverables for McGill Artificial Intelligence Society's Accelerated Introduction to Machine Learning Bootcamp found in 'Deliverables' folder
+
+## Possible additional experimentation
+- Experiment with the use of transformers
+- Augment dataset by slightly increasing/decreasing pitch/duration of each note
+- Use the [MAESTRO dataset](https://magenta.tensorflow.org/datasets/maestro) and have velocity as a regression problem instead of a binary classification problem to emulate human performance
