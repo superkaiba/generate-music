@@ -24,22 +24,34 @@ class MusicGenerator:
         inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
         x = SeqSelfAttention(attention_activation='tanh')(inputs)
 
-        hidden_states = layers.Bidirectional(layers.LSTM(
+        x = layers.LSTM(
             self.lstm_units, 
             dropout=0.2,
             recurrent_dropout=0.2,
             activation='tanh', 
             recurrent_activation='sigmoid', 
             input_shape=(NUM_TIMESTEPS, 3), 
-            return_sequences=True))(x)
+            return_sequences=True)(x)
+
+        x = SeqSelfAttention(attention_activation='tanh')(x)
+
+        hidden_states = layers.LSTM(
+            self.lstm_units, 
+            dropout=0.2,
+            recurrent_dropout=0.2,
+            activation='tanh', 
+            recurrent_activation='sigmoid', 
+            input_shape=(NUM_TIMESTEPS, 3), 
+            return_sequences=True)(x)
+
 
         last_hidden_state = hidden_states[:,NUM_TIMESTEPS - 1,:]
-        last_hidden_state = layers.Reshape((1, self.lstm_units * 2))(last_hidden_state)
+        last_hidden_state = layers.Reshape((1, self.lstm_units))(last_hidden_state)
 
         context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
-        context_vector = layers.Reshape((self.lstm_units * 2,))(context_vector)
+        context_vector = layers.Reshape((self.lstm_units,))(context_vector)
 
-        last_hidden_state = layers.Reshape((self.lstm_units * 2,))(last_hidden_state)
+        last_hidden_state = layers.Reshape((self.lstm_units,))(last_hidden_state)
 
         x = layers.Concatenate(axis=-1)([last_hidden_state, context_vector])
         x = layers.Dropout(0.2)(x)

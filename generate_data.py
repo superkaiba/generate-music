@@ -3,8 +3,8 @@ import numpy as np
 import os
 from params import *
 
-TRAIN_DATA_FOLDER = "train-data"
-TEST_DATA_FOLDER = "test-data"
+TRAIN_DATA_FOLDER = "dataset/train-data"
+TEST_DATA_FOLDER = "dataset/test-data"
 
 os.mkdir(PROCESSED_DATA_DIRNAME)
 
