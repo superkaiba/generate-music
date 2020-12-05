@@ -41,7 +41,7 @@ Once changes are made, run `train.py` to train new model
 ## Dataset
 Dataset can be found already separated in 'dataset/train-data' and 'dataset/test-data' folders
 
-A subset of the dataset containing only pieces by Mozart and Haydn (useful for quicklytesting models) can be found in 'dataset/smaller-dataset-test' and 'dataset/smaller-dataset-train'. 
+A subset of the dataset containing only pieces by Mozart and Haydn (useful for quickly testing models) can be found in 'dataset/smaller-dataset-test' and 'dataset/smaller-dataset-train'. 
 
 Data taken from here: http://www.piano-midi.de/
 

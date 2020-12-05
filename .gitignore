@@ -1,6 +1,6 @@
 ignore
 *.hdf5
-
+!webapp-data/weights.hd5
 *.npy
 *.csv
 .vscode

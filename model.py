@@ -14,47 +14,51 @@ from utils import *
 from midi2audio import FluidSynth
 
 class MusicGenerator:
-    def __init__(self, lstm_units=1024, model_name="music_generator"):
+    def __init__(self, experimental=False,lstm_units=1024, model_name="music_generator"):
         self.lstm_units = lstm_units
         self.model_name = model_name
-        self.model = self.create_model()
+        if experimental:
+            self.model = self.create_experimental_model()
+        else:
+            self.model = self.create_model()
 
-    # def create_model(self):
+    def create_experimental_model(self):
 
-    #     inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
-    #     x = SeqSelfAttention(attention_activation='tanh')(inputs)
+        inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
+        x = SeqSelfAttention(attention_activation='tanh')(inputs)
 
-    #     hidden_states = layers.LSTM(
-    #         self.lstm_units, 
-    #         activation='tanh', 
-    #         recurrent_activation='sigmoid', 
-    #         input_shape=(NUM_TIMESTEPS, 3), 
-    #         return_sequences=True)(x)
+        hidden_states = layers.LSTM(
+            self.lstm_units, 
+            activation='tanh', 
+            recurrent_activation='sigmoid', 
+            input_shape=(NUM_TIMESTEPS, 3), 
+            return_sequences=True)(x)
 
-    #     last_hidden_state = hidden_states[:,NUM_TIMESTEPS - 1,:]
-    #     last_hidden_state = layers.Reshape((1, self.lstm_units))(last_hidden_state)
+        last_hidden_state = hidden_states[:,NUM_TIMESTEPS - 1,:]
+        last_hidden_state = layers.Reshape((1, self.lstm_units))(last_hidden_state)
 
-    #     vel_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
-    #     vel_context_vector = layers.Reshape((self.lstm_units,))(vel_context_vector)
-    #     reshaped_last_hidden_state = layers.Reshape((self.lstm_units,))(last_hidden_state)
+        vel_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
+        vel_context_vector = layers.Reshape((self.lstm_units,))(vel_context_vector)
+        reshaped_last_hidden_state = layers.Reshape((self.lstm_units,))(last_hidden_state)
 
-    #     x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, vel_context_vector])
-    #     vel_output = layers.Dense(units=2, activation='softmax', name='vel_out')(x)
+        x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, vel_context_vector])
+        vel_output = layers.Dense(units=2, activation='softmax', name='vel_out')(x)
 
-    #     dur_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
-    #     dur_context_vector = layers.Reshape((self.lstm_units,))(dur_context_vector)
+        dur_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
+        dur_context_vector = layers.Reshape((self.lstm_units,))(dur_context_vector)
 
-    #     x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, dur_context_vector, vel_output])
-    #     duration_output = layers.Dense(units=1, activation='sigmoid', name='duration_out')(x)
+        x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, dur_context_vector, vel_output])
+        duration_output = layers.Dense(units=1, activation='sigmoid', name='duration_out')(x)
 
-    #     pitch_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
-    #     pitch_context_vector  = layers.Reshape((self.lstm_units,))(pitch_context_vector)
-    #     x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, pitch_context_vector, duration_output, vel_output])
+        pitch_context_vector = layers.AdditiveAttention()([last_hidden_state, hidden_states, hidden_states])
+        pitch_context_vector  = layers.Reshape((self.lstm_units,))(pitch_context_vector)
+        x = layers.Concatenate(axis=-1)([reshaped_last_hidden_state, pitch_context_vector, duration_output, vel_output])
 
-    #     pitch_outputs = layers.Dense(units=88, activation = 'softmax', name='pitch_out')(x)
-    #     model = keras.Model(inputs=inputs, outputs=[pitch_outputs, duration_output, vel_output])
+        pitch_outputs = layers.Dense(units=88, activation = 'softmax', name='pitch_out')(x)
+        model = keras.Model(inputs=inputs, outputs=[pitch_outputs, duration_output, vel_output])
 
-    #     return model
+        return model
+
     def create_model(self):
         inputs = layers.Input(shape=(NUM_TIMESTEPS, 3))
         x = SeqSelfAttention(attention_activation='tanh')(inputs)
@@ -84,7 +88,7 @@ class MusicGenerator:
         model = keras.Model(inputs=inputs, outputs=[pitch_outputs, duration_output, vel_output])
         return model
 
-    def train(self, epochs=50, lr=0.001, initial_epoch=0, train_data_fpath=TRAIN_DATA_FPATH, pitch_labels_fpath=PITCH_LABELS_FPATH, duration_labels_fpath=DURATION_LABELS_FPATH, vel_labels_fpath=VEL_LABELS_FPATH):
+    def train(self, weights_path=None, epochs=50, lr=0.001, initial_epoch=0, train_data_fpath=TRAIN_DATA_FPATH, pitch_labels_fpath=PITCH_LABELS_FPATH, duration_labels_fpath=DURATION_LABELS_FPATH, vel_labels_fpath=VEL_LABELS_FPATH):
         '''Trains model with specified parameters using data from specified filepaths
         '''
 
@@ -93,7 +97,8 @@ class MusicGenerator:
         duration_labels = np.load(duration_labels_fpath)
         vel_labels = np.load(vel_labels_fpath)
 
-        # os.mkdir(self.model_name)
+        if initial_epoch == 0:
+            os.mkdir(self.model_name)
 
         filepath = self.model_name + "/weights-epoch-{epoch:02d}-loss-{loss:.4f}-accuracy-{pitch_out_accuracy:.4f}.hdf5" 
         checkpoint = keras.callbacks.ModelCheckpoint(
@@ -105,8 +110,9 @@ class MusicGenerator:
 
         csvlogger = keras.callbacks.CSVLogger(f"{self.model_name}/epoch-results.csv",append=True)
         myScheduler = keras.callbacks.LearningRateScheduler(self.scheduler)
-
-        opt = keras.optimizers.Adam(learning_rate=0.001)
+        
+        opt = keras.optimizers.Adam(learning_rate=lr)
+        
 
 
         self.model.compile(
@@ -130,9 +136,10 @@ class MusicGenerator:
             )
         self.model.build(input_shape=data.shape)
         self.model.summary()
-
-        self.model.save(f"{self.model_name}/saved_model_configuration")
-
+        if initial_epoch == 0:
+            self.model.save(f"{self.model_name}/saved_model_configuration")
+        else:
+            self.model.load_weights(weights_path)
         self.model.fit(x=data,  y={'pitch_out': pitch_labels, 'duration_out': duration_labels, 'vel_out': vel_labels}, batch_size=128, epochs=epochs, callbacks=[checkpoint, csvlogger, myScheduler], initial_epoch=initial_epoch)
              
     def generate(self, sequence_length, weights_path, generation_data_path, midi_output_dir=".", wav_output_dir=".", random_index=None, include_initial_sequence=True):
@@ -151,7 +158,7 @@ class MusicGenerator:
         if include_initial_sequence:
             for i in range(NUM_TIMESTEPS):
                 note = denormalize(sequence[0][i])
-                track.append(md.Message('note_on', note=int(note[0]), time=int(note[1]) * 1.3, velocity=int(note[2])))
+                track.append(md.Message('note_on', note=int(note[0]), time=int(note[1] * 1.3), velocity=int(note[2])))
             track.append(md.Message('note_on', note=108, time=0, velocity=100)) # Indicate end of initial sequence
 
         note_range = range(21,109)
